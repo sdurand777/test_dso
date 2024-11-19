@@ -412,6 +412,8 @@ int main( int argc, char** argv )
     // to make MacOS happy: run this in dedicated thread -- and use this one to run the GUI.
     // run the slam
     std::thread runthread([&]() {
+
+        // ids and timestamp
         std::vector<int> idsToPlay;
         std::vector<double> timesToPlayAt;
 

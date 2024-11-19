@@ -19,13 +19,27 @@ find_package(Boost COMPONENTS system thread)
 
 # optional libraries
 find_package(LibZip QUIET)
-find_package(Pangolin 0.2 QUIET)
+
+set(CMAKE_PREFIX_PATH "/home/ivm/Pangolin/build/src")
+
+#find_package(Pangolin 0.2 QUIET)
+find_package(Pangolin REQUIRED)
+
+if (Pangolin_FOUND)
+    message(STATUS "Pangolin found!")
+    message(STATUS "Pangolin include directories: ${Pangolin_INCLUDE_DIRS}")
+    message(STATUS "Pangolin libraries: ${Pangolin_LIBRARIES}")
+else()
+    message(FATAL_ERROR "Pangolin not found. Please check the CMAKE_PREFIX_PATH or install Pangolin.")
+endif()
+
 find_package(OpenCV QUIET)
 
 # flags
 add_definitions("-DENABLE_SSE")
 set(CMAKE_CXX_FLAGS
    "${SSE_FLAGS} -O3 -g -std=c++0x -march=native"
+#   "${SSE_FLAGS} -O0 -g -std=c++0x -march=native"
 #   "${SSE_FLAGS} -O3 -g -std=c++0x -fno-omit-frame-pointer"
 )
 

@@ -107,7 +107,7 @@ struct FrameFramePrecalc
 
 
 
-struct FrameHessian
+struct FrameHessian // structure pour store et manipuler les frames dans le tracking
 {
 	EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
 	EFFrame* efFrame;

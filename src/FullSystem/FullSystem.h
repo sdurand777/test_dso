@@ -151,7 +151,7 @@ public:
 
 private:
 
-	CalibHessian Hcalib;
+	CalibHessian Hcalib; // calib
 
 
 
@@ -241,7 +241,7 @@ private:
 
 	// =================== changed by tracker-thread. protected by trackMutex ============
 	boost::mutex trackMutex;
-	std::vector<FrameShell*> allFrameHistory;
+	std::vector<FrameShell*> allFrameHistory; // store tracked frames
 	CoarseInitializer* coarseInitializer;
 	Vec5 lastCoarseRMSE;
 

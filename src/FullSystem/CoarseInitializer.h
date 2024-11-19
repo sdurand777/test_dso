@@ -76,6 +76,10 @@ public:
 	float outlierTH;
 };
 
+
+
+
+
 class CoarseInitializer {
 public:
 	EIGEN_MAKE_ALIGNED_OPERATOR_NEW;

@@ -66,6 +66,8 @@ CoarseInitializer::CoarseInitializer(int ww, int hh) : thisToNext_aff(0,0), this
 	wM.diagonal()[6] = SCALE_A;
 	wM.diagonal()[7] = SCALE_B;
 }
+
+
 CoarseInitializer::~CoarseInitializer()
 {
 	for(int lvl=0; lvl<pyrLevelsUsed; lvl++)
@@ -275,6 +277,9 @@ bool CoarseInitializer::trackFrame(FrameHessian* newFrameHessian, std::vector<IO
 	return snapped && frameID > snappedAt+5;
 }
 
+
+
+
 void CoarseInitializer::debugPlot(int lvl, std::vector<IOWrap::Output3DWrapper*> &wraps)
 {
     bool needCall = false;
@@ -324,6 +329,9 @@ void CoarseInitializer::debugPlot(int lvl, std::vector<IOWrap::Output3DWrapper*>
     for(IOWrap::Output3DWrapper* ow : wraps)
         ow->pushDepthImage(&iRImg);
 }
+
+
+
 
 // calculates residual, Hessian and Hessian-block neede for re-substituting depth.
 Vec3f CoarseInitializer::calcResAndGS(
@@ -764,19 +772,23 @@ void CoarseInitializer::makeGradients(Eigen::Vector3f** data)
 		}
 	}
 }
+
+
+
+
 void CoarseInitializer::setFirst(	CalibHessian* HCalib, FrameHessian* newFrameHessian)
 {
 
-	makeK(HCalib);
-	firstFrame = newFrameHessian;
+	makeK(HCalib); // calcul des intrinseque pour les differents niveaux de la pyramide
+	firstFrame = newFrameHessian; // ajout de la frame au initializer
 
-	PixelSelector sel(w[0],h[0]);
+	PixelSelector sel(w[0],h[0]); // selection des pixels a tracker ?
 
 	float* statusMap = new float[w[0]*h[0]];
 	bool* statusMapB = new bool[w[0]*h[0]];
 
-	float densities[] = {0.03,0.05,0.15,0.5,1};
-	for(int lvl=0; lvl<pyrLevelsUsed; lvl++)
+	float densities[] = {0.03,0.05,0.15,0.5,1}; // densite par niveau de la pyramide ?
+	for(int lvl=0; lvl<pyrLevelsUsed; lvl++) // loop sur les niveaux de la pyramide
 	{
 		sel.currentPotential = 3;
 		int npts;
@@ -926,6 +938,8 @@ void CoarseInitializer::applyStep(int lvl)
 	}
 	std::swap<Vec10f*>(JbBuffer, JbBuffer_new);
 }
+
+
 
 void CoarseInitializer::makeK(CalibHessian* HCalib)
 {

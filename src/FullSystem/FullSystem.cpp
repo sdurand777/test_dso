@@ -58,6 +58,7 @@
 
 namespace dso
 {
+
 int FrameHessian::instanceCounter=0;
 int PointHessian::instanceCounter=0;
 int CalibHessian::instanceCounter=0;
@@ -175,6 +176,9 @@ FullSystem::FullSystem()
 	maxIdJetVisTracker = -1;
 }
 
+
+
+// destructor
 FullSystem::~FullSystem()
 {
 	blockUntilMappingIsFinished();
@@ -208,10 +212,14 @@ FullSystem::~FullSystem()
 	delete ef;
 }
 
+
+
 void FullSystem::setOriginalCalib(const VecXf &originalCalib, int originalW, int originalH)
 {
 
 }
+
+
 
 void FullSystem::setGammaFunction(float* BInv)
 {
@@ -266,6 +274,8 @@ void FullSystem::printResult(std::string file)
 	}
 	myfile.close();
 }
+
+
 
 
 Vec4 FullSystem::trackNewCoarse(FrameHessian* fh)
@@ -799,28 +809,30 @@ void FullSystem::flagPointsForRemoval()
 }
 
 
+
+
+// main function where we add the new frame for tracking
 void FullSystem::addActiveFrame( ImageAndExposure* image, int id )
 {
 
     if(isLost) return;
-	boost::unique_lock<boost::mutex> lock(trackMutex);
-
+	boost::unique_lock<boost::mutex> lock(trackMutex); // verouille les donnees partagees pendant le tracking de cette frame
 
 	// =========================== add into allFrameHistory =========================
 	FrameHessian* fh = new FrameHessian();
 	FrameShell* shell = new FrameShell();
 	shell->camToWorld = SE3(); 		// no lock required, as fh is not used anywhere yet.
-	shell->aff_g2l = AffLight(0,0);
+	shell->aff_g2l = AffLight(0,0); // fonction affine pour la gestion de la brightness
     shell->marginalizedAt = shell->id = allFrameHistory.size();
     shell->timestamp = image->timestamp;
     shell->incoming_id = id;
-	fh->shell = shell;
-	allFrameHistory.push_back(shell);
+	fh->shell = shell; // on met shell dans fh
+	allFrameHistory.push_back(shell); // store shell in history
 
 
 	// =========================== make Images / derivatives etc. =========================
-	fh->ab_exposure = image->exposure_time;
-    fh->makeImages(image->image, &Hcalib);
+	fh->ab_exposure = image->exposure_time; // store exposure info in fh
+    fh->makeImages(image->image, &Hcalib); // add calib to image
 
 
 
@@ -831,7 +843,7 @@ void FullSystem::addActiveFrame( ImageAndExposure* image, int id )
 		if(coarseInitializer->frameID<0)	// first frame set. fh is kept by coarseInitializer.
 		{
 
-			coarseInitializer->setFirst(&Hcalib, fh);
+			coarseInitializer->setFirst(&Hcalib, fh); // add first frame to initializer
 		}
 		else if(coarseInitializer->trackFrame(fh, outputWrapper))	// if SNAPPED
 		{
@@ -853,7 +865,7 @@ void FullSystem::addActiveFrame( ImageAndExposure* image, int id )
 		// =========================== SWAP tracking reference?. =========================
 		if(coarseTracker_forNewKF->refFrameID > coarseTracker->refFrameID)
 		{
-			boost::unique_lock<boost::mutex> crlock(coarseTrackerSwapMutex);
+			boost::unique_lock<boost::mutex> crlock(coarseTrackerSwapMutex); // mutex
 			CoarseTracker* tmp = coarseTracker; coarseTracker=coarseTracker_forNewKF; coarseTracker_forNewKF=tmp;
 		}
 
@@ -901,6 +913,10 @@ void FullSystem::addActiveFrame( ImageAndExposure* image, int id )
 		return;
 	}
 }
+
+
+
+
 void FullSystem::deliverTrackedFrame(FrameHessian* fh, bool needKF)
 {
 
@@ -1196,6 +1212,7 @@ void FullSystem::makeKeyFrame( FrameHessian* fh)
 }
 
 
+// initialisation
 void FullSystem::initializeFromInitializer(FrameHessian* newFrame)
 {
 	boost::unique_lock<boost::mutex> lock(mapMutex);

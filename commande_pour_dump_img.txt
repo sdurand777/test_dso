@@ -1,0 +1,1 @@
+dump binary memory image_dump.bin img->image img->image + (640*480)
